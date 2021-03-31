@@ -16,7 +16,7 @@ NumType = NewType("NumType", float)  # need confirmation on this datatype
 
 
 class defaultTx(TypedDict, total=False):
-    frm: str
+    From: str
     gas: float
     gasPrice: float
 
@@ -39,7 +39,8 @@ class listenEvent(TypedDict, total=False):
 class Artifact(TypedDict, total=False):
     contract_name: str
     abi: dict
-    networks: dict = {"networkId": {"address": str}}
+    networks: dict
+    # networks: dict = {"networkId": {"address": str}}
 
 
 class BaseContractType(TypedDict, total=False):
@@ -69,7 +70,7 @@ class TransferType(defaultTx, TypedDict):
 
 
 Constants = namedtuple("Constants", ["DEFAULT_GAS", "NULL_ADDRESS"])
-const = Constants(4e5, "0x0000000000000000000000000000000000000000")
+const = Constants(int(4e5), "0x0000000000000000000000000000000000000000")
 """
     accessed by const.DEFAULT_GAS and const.NULL_ADDRESS
 """
@@ -99,50 +100,63 @@ class TokenBondType(defaultTx, TypedDict):
     endpoint: str
     dots: NumType
 
+
 class BondType(defaultTx, TypedDict, total=False):
     subscriber: str
     provider: str
     endpoint: str
     dots: NumType
 
+
 class DelegateBondType(BondType, TypedDict):
     subscriber: str
+
 
 class UnbondType(defaultTx, TypedDict):
     provider: str
     endpoint: str
     dots: NumType
 
+
 class SubscribeType(defaultTx, TypedDict):
     provider: str
     endpoint: str
     dots: NumType
-    endpoint_params: list #need confirmation on this data type
+    endpoint_params: list  # need confirmation on this data type
+
 
 class SubscriberHandler(TypedDict, total=False):
-    handleResponse: Callable[..., Any]  # accepts a function, takes any # of args
-    handleUnsubscription: Callable[..., Any]  # accepts a function, takes any # of args
-    handleSubscription: Callable[..., Any]  # accepts a function, takes any # of args
+    """
+        Callable types accepts a function, takes any # of args
+    """
+    handleResponse: Callable[..., Any]
+    handleUnsubscription: Callable[..., Any]
+    handleSubscription: Callable[..., Any]
+
 
 class ApproveType(defaultTx, TypedDict):
     provider: str
     zapNum: float
+
 
 class BondArgs(defaultTx, TypedDict):
     provider: str
     endpoint: str
     dots: NumType
 
+
 class UnbondArgs(defaultTx, TypedDict):
     provider: str
     endpoint: str
     dots: NumType
+
 
 class DelegateBondArgs(defaultTx, TypedDict):
     provider: str
     endpoint: str
     dots: NumType
     subscriber: str
+
 
 class BondageArgs(TypedDict, total=False):
     subscriber: str
@@ -151,10 +165,12 @@ class BondageArgs(TypedDict, total=False):
     dots: NumType
     zapNum: NumType
 
+
 class CalcBondRateType(TypedDict):
     provider: str
     endpoint: str
     zapNum: NumType
+
 
 class BondFilter(Filter, TypedDict, total=False):
     numDots: NumType
@@ -163,4 +179,43 @@ class BondFilter(Filter, TypedDict, total=False):
 
 ############# TOKEN DOT FACTORY #############
 
-TransactionCallback = NewType("TransactionCallback", Callable[str or None, str or None]) # accepts a function, takes error and hash as args
+# accepts a function, takes error and hash as args
+TransactionCallback = NewType(
+    "TransactionCallback", Callable[[str, str], None])
+
+
+############# PROVIDER #############
+
+class InitProvider(defaultTx, TypedDict):
+    public_key: str
+    title: str
+
+
+class InitCurve(defaultTx, TypedDict, total=False):
+    endpoint: str
+    term: list
+    broker: address
+
+
+class NextEndpoint(TypedDict):
+    provider: address
+    endpoint: str
+
+
+class EndpointParams(defaultTx, TypedDict):
+    endpoint: str
+    endpoint_params: list
+
+
+class SetProviderParams(defaultTx, TypedDict):
+    key: str
+    value: str
+
+
+class SetProviderTitle(defaultTx, TypedDict):
+    From: address
+    title: str
+
+
+class Endpoint(defaultTx, TypedDict):
+    endpoint: str
