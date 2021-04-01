@@ -135,3 +135,7 @@ pip-wheel-metadata/
 
 # jupyter notebook files
 *.ipynb
+
+
+# misc files
+sandbox.py
