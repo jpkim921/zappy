@@ -48,6 +48,9 @@
         "links": {},
         "address": "0x0065b089cfa9f524684c80ae1d045403e155d088",
         "transactionHash": "0x61b08cdcda5b9c9b8097b88d0123f9aab0a6381c927439d191aa318114f3e5ec"
+      },
+      "31337": {
+        "address": "0x9d4454b023096f34b160d6b654540c56a1f81688"
       }
     }
   }

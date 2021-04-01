@@ -175,6 +175,9 @@
         "address": "0x8e4c131b37383e431b9cd0635d3cf9f3f628edae",
         "transactionHash": "0x39e1009fa32a6419c5bdb35f33e3a7e48871a9eb6d5684de58b6637a05646291"
       },
+      "31337": {
+        "address": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9"
+      },
       "development": {
         "events": {},
         "links": {},

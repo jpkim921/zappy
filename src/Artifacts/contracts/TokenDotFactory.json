@@ -274,6 +274,9 @@
         "links": {},
         "address": "0xf108237201E6EE3906f19390C699dA4d1495040F",
         "transactionHash": "0x52a4cdc19fdb99c432317d14b4b27254c430998fc8baa4c9a56bcc6e9915f1eb"
+      },
+      "31337": {
+        "address": "0x5eb3bc0a489c5a8288765d2336659ebca68fcd00"
       }
     }
   }
