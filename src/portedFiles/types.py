@@ -1,4 +1,4 @@
-from typing import TypedDict, Callable, Any, NewType
+from typing import TypedDict, Callable, Any, NewType, List
 from collections import namedtuple
 
 address = NewType("address", str)
@@ -75,7 +75,7 @@ const = Constants(int(4e5), "0x0000000000000000000000000000000000000000")
     accessed by const.DEFAULT_GAS and const.NULL_ADDRESS
 """
 
-
+################ ARBITER ################
 class SubscriptionInit(defaultTx, TypedDict, total=False):
     provider: str
     endpoint: str
@@ -83,16 +83,34 @@ class SubscriptionInit(defaultTx, TypedDict, total=False):
     blocks: NumType
     pubkey: NumType
 
-
 class SubscriptionEnd(defaultTx, TypedDict, total=False):
     provider: str
 
+class SubscriptionEndEvent(defaultTx, TypedDict, total=False):
+    terminator: address
 
 class SubscriptionType(TypedDict):
     provider: str
     subscriber: str
     endpoint: str
 
+
+class SubscriptionParams(defaultTx, TypedDict):
+    receiver: address
+    endpoint: str
+    params: List[str]
+
+class DataPurchaseEvent(Filter, TypedDict, total=False):
+    publicKey: int
+    amount: int
+    endpoint: str
+    endpointParams: str
+
+class ParamsPassedEvent(TypedDict, total=False):
+    sender: address
+    receiver: address
+    endpoint: str
+    params: str
 
 ############# BONDAGE #############
 
