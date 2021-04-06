@@ -16,7 +16,7 @@ class BaseContract:
     provider: Any
     web3: Any
     contract: Any
-    network_id: int
+    networkId: int
     coordinator: Any
     artifact: Any
     name: str
@@ -32,7 +32,7 @@ class BaseContract:
     def __init__(self,
                  artifact_name: str,
                  web3: Any = None,
-                 network_id: int = 1,
+                 networkId: int = 1,
                  network_provider: Any = None,
                  artifacts_dir: str = None,
                  coordinator: str = None,
@@ -66,14 +66,14 @@ class BaseContract:
             #
             """
 
-            self.network_id = network_id or 1
+            self.networkId = networkId or 1
 
             if coordinator is not None:
                 checksum_coor_address = self.w3.toChecksumAddress(coordinator)
             else:
                 checksum_coor_address = \
                     self.w3.toChecksumAddress(
-                        self.coor_artifact['networks'][str(self.network_id)]['address'])
+                        self.coor_artifact['networks'][str(self.networkId)]['address'])
 
             self.coordinator = self.w3.eth.contract(
                 address=checksum_coor_address, abi=self.coor_artifact['abi'])
@@ -82,7 +82,7 @@ class BaseContract:
                 self.address = address
             else:
                 self.address = self.artifact['networks'][str(
-                    self.network_id)]['address']
+                    self.networkId)]['address']
 
             self.contract = None
 

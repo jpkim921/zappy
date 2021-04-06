@@ -76,10 +76,10 @@ const = Constants(int(4e5), "0x0000000000000000000000000000000000000000")
 """
 
 ################ ARBITER ################
-class SubscriptionInit(defaultTx, TypedDict, total=False):
+class SubscriptionInit(defaultTx, total=False):
     provider: str
     endpoint: str
-    endpoint_params: list
+    endpoint_params: List[str]
     blocks: NumType
     pubkey: NumType
 
