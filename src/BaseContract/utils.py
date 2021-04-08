@@ -34,7 +34,6 @@ class Utils:
     # @params {string} artifact
     # @returns {dict}
     """
-
     @staticmethod
     def open_artifact_in_dir(artifact: str) -> dict:
         with open(artifact) as f:

@@ -1,113 +1,113 @@
+from web3 import Web3
+import asyncio
+
 import os
 import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath("./__file__")))
 
-from typing import Any
-from web3 import Web3
-import asyncio
-
-from src.BaseContract.utils import Utils
-from src.Artifacts.src.index import Artifacts
-#from portedFiles.types import base_contract_type
+import src.Artifacts.src.index as index
+import src.BaseContract.utils as utils
 
 
 class BaseContract:
-
-    provider: Any
-    web3: Any
-    contract: Any
+    provider: any
+    web3: any
+    contract: any
     networkId: int
-    coordinator: Any
-    artifact: Any
+    coordinator: any
+    artifact: any
     name: str
-    address: str = None
-
-    """
-    @param {string | null} b.artifacts_dir - Directory where contract ABIs are located
-    @param {string} b.artifact_name - Contract name for this contract object
-    @param {number | null} b.networkId - Select which network the contract is located on (mainnet, testnet, private)
-    @param {any | null} b.network_Provider - Ethereum network provider (e.g. Infura)
-    """
+    address: str or None
 
     def __init__(self,
                  artifact_name: str,
-                 web3: Any = None,
+                 web3: any = None,
                  networkId: int = 1,
-                 network_provider: Any = None,
+                 network_provider: any = None,
                  artifacts_dir: str = None,
                  coordinator: str = None,
-                 contract: Any = None,
                  address: str = None
                  ):
-
-        self.name = artifact_name
-        self.loop = asyncio.get_event_loop()
         try:
-
             if artifacts_dir is None:
-                self.artifact = Artifacts[artifact_name]
-                self.coor_artifact = Artifacts['ZAPCOORDINATOR']
+                self.artifact = index.Artifacts[artifact_name]
+                self.coor_artifact = index.Artifacts['ZAPCOORDINATOR']
             else:
-                artifacts: any = Utils.get_artifacts(artifacts_dir)
-                self.artifact = Utils.open_artifact_in_dir(
+                artifacts: any = utils.Utils.get_artifacts(artifacts_dir)
+                self.artifact = utils.Utils.open_artifact_in_dir(
                     artifacts[artifact_name])
-                self.coor_artifact = Utils.open_artifact_in_dir(
+                self.coor_artifact = utils.Utils.open_artifact_in_dir(
                     artifacts['ZAPCOORDINATOR'])
 
+            self.name = artifact_name
             self.provider = web3 or Web3(
                 network_provider or Web3.HTTPProvider("https://cloudflare-eth.com"))
             self.w3 = web3 or Web3(network_provider or Web3.HTTPProvider(
                 "https://cloudflare-eth.com"))
-
-            """
-            #
-            #   The added 'self.w3' above looks redundant; however, 'self.provider' was not recognized as a web3 provider. 
-            #   Maybe delete provider?
-            #
-            """
-
             self.networkId = networkId or 1
+            self.address = address or self.artifact['networks'][str(
+                self.networkId)]['address']
 
             if coordinator is not None:
-                checksum_coor_address = self.w3.toChecksumAddress(coordinator)
-            else:
-                checksum_coor_address = \
-                    self.w3.toChecksumAddress(
-                        self.coor_artifact['networks'][str(self.networkId)]['address'])
+                self.coordinator = self.w3.eth.contract(address=self.w3.toChecksumAddress(coordinator),
+                                                        abi=self.coor_artifact['abi'])
 
-            self.coordinator = self.w3.eth.contract(
-                address=checksum_coor_address, abi=self.coor_artifact['abi'])
+                contract_address = self.get_contract()
+                self.contract = self.w3.eth.contract(address=self.w3.toChecksumAddress(contract_address),
+                                                     abi=self.artifact['abi'])
 
-            if address is not None:
-                self.address = address
             else:
-                self.address = self.artifact['networks'][str(
+                self.coor_address = self.coor_artifact['networks'][str(
                     self.networkId)]['address']
+                self.coordinator = self.w3.eth.contract(address=self.w3.toChecksumAddress(self.coor_address),
+                                                        abi=self.coor_artifact['abi'])
 
-            self.contract = None
-
-            if coordinator is not None:
-                """
-                #   The get_contract function won't run without proper abi
-                """
-                asyncio.run(self.get_contract())
-            else:
                 self.contract = self.w3.eth.contract(address=self.w3.toChecksumAddress(self.address),
                                                      abi=self.artifact['abi'])
 
         except Exception as e:
             raise e
 
-    # Async class methods
-    async def get_contract(self):
-        contract_address = await self.coordinator.functions.getContract(self.name.upper()).call()
-        self.contract = self.w3.eth.contract(
-            address=contract_address, abi=self.artifact['abi'])
+    async def _get_contract(self) -> str:
+        """
+        This async function fetches the contract address from the coordinator abi. Thereafter, the function returns the
+        address where it is assigned to the address kwarg in the contract instance.
+
+        :return: the contract address of the coordinator.
+        """
+        await asyncio.sleep(.5)
+        contract_address = self.coordinator.functions.getContract(
+            self.name).call()
         return contract_address
 
-    def get_contract_owner(self):
-        return self.loop.run_until_complete(self.__async__get_contract_owner())
+    async def _get_contract_owner(self) -> str:
+        """
+        This async function fetches the owner of the contract instance.
 
-    async def __async__get_contract_owner(self):
-        contract_owner = await self.contract.functions.owner().call()
+        :return: the contract owner's address.
+        """
+        await asyncio.sleep(.5)
+        contract_owner = self.contract.functions.owner().call()
         return contract_owner
+
+    def get_contract(self) -> str:
+        """
+        A synchronous function that wraps the asynchronous _get_contract method. This function returns the contract
+        address fetched from the asynchronous _get_contract function.
+
+        :return: the contract address.
+        """
+        task = self._get_contract()
+        contract_address = asyncio.run(task)
+        return contract_address
+
+    def get_contract_owner(self) -> str:
+        """
+        A synchronous function that wraps the asynchronous _get_contract_owner method. This function returns the
+        contract owner's address.
+
+        :return: the contract owner's address.
+        """
+        task = self._get_contract_owner()
+        owner = asyncio.run(task)
+        return owner
